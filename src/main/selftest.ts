@@ -153,10 +153,17 @@ export async function runSelfTest(ctx: Ctx): Promise<void> {
       )
       report[`fonts-${tag}`] = fontsOk
 
-      // Ctrl+Enter -> clipboard + hide
+      // Copy -> clipboard + hide. Native-scale cases use Ctrl+Enter; the 2x case
+      // uses the copy shortcut: Ctrl+C keystrokes on Windows, and on macOS what
+      // ⌘C does through the Edit menu (webContents.copy()).
       clipboard.clear()
-      ew.webContents.sendInputEvent({ type: 'keyDown', keyCode: 'Enter', modifiers: ['control'] })
-      ew.webContents.sendInputEvent({ type: 'keyUp', keyCode: 'Enter', modifiers: ['control'] })
+      if (exportScale === 2 && process.platform === 'darwin') {
+        ew.webContents.copy()
+      } else {
+        const keyCode = exportScale === 2 ? 'C' : 'Enter'
+        ew.webContents.sendInputEvent({ type: 'keyDown', keyCode, modifiers: ['control'] })
+        ew.webContents.sendInputEvent({ type: 'keyUp', keyCode, modifiers: ['control'] })
+      }
       await until(() => !ew.isVisible(), 3000, 'editor hidden after copy')
       const clip = await readClipboardPng()
       writeFileSync(join(out, `clipboard-${exportScale}-d${target.id}.png`), clip.toPNG())
@@ -168,6 +175,50 @@ export async function runSelfTest(ctx: Ctx): Promise<void> {
         const diff = pixelDiff(nativeImage.createFromBuffer(result.png), clip)
         check(`[${tag}] clipboard pixels == crop pixels`, diff.max <= 2, diff)
       }
+    }
+
+    // --- 1b. Ctrl+C while typing copies the text, not the image -------------
+    {
+      await ctx.snips.start()
+      const cur = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
+      const ow = ctx.overlays.getWindow(cur.id)!
+      await drag(ow, 60, 80, 460, 330)
+      await mouseUp(ow, 460, 330)
+      const ew = ctx.editor.browserWindow()!
+      await until(() => ew.isVisible(), 3000, 'editor visible')
+      await sleep(500)
+      const wc = ew.webContents
+      const press = async (keyCode: string, modifiers: Array<'control'> = []): Promise<void> => {
+        wc.sendInputEvent({ type: 'keyDown', keyCode, modifiers })
+        if (modifiers.length === 0) wc.sendInputEvent({ type: 'char', keyCode })
+        wc.sendInputEvent({ type: 'keyUp', keyCode, modifiers })
+        await sleep(150)
+      }
+      // What ⌘A / ⌘C do through the macOS Edit menu; Ctrl+A / Ctrl+C elsewhere.
+      const selectAll = (): Promise<void> => (process.platform === 'darwin' ? (wc.selectAll(), sleep(150)) : press('A', ['control']))
+      const copyKey = (): Promise<void> => (process.platform === 'darwin' ? (wc.copy(), sleep(150)) : press('C', ['control']))
+      const [cw, ch] = ew.getContentSize()
+      await press('t')
+      wc.sendInputEvent({ type: 'mouseDown', x: Math.round(cw / 2), y: Math.round(ch / 2), button: 'left', clickCount: 1 })
+      wc.sendInputEvent({ type: 'mouseUp', x: Math.round(cw / 2), y: Math.round(ch / 2), button: 'left', clickCount: 1 })
+      await sleep(300)
+      for (const c of 'hello') wc.sendInputEvent({ type: 'char', keyCode: c })
+      await sleep(200)
+      await selectAll()
+      await clipboard.writeText('')
+      await copyKey()
+      await sleep(400)
+      const text = await clipboard.readText()
+      check('Ctrl+C while typing copies the text, not the image', ew.isVisible() && text === 'hello', {
+        editorStillOpen: ew.isVisible(),
+        clipboardText: text
+      })
+      await press('Escape') // finish the text annotation
+      await sleep(200)
+      await copyKey()
+      await until(() => !ew.isVisible(), 3000, 'editor hidden after Ctrl+C')
+      const img = (await readClipboardPng()).getSize()
+      check('Ctrl+C copies the annotated image and closes the editor', img.width > 0 && img.height > 0, img)
     }
 
     // --- 2. Esc cancels ------------------------------------------------------

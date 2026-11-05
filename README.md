@@ -20,7 +20,8 @@ take the whole screen.
 
 ![The SnipDraw editor open next to the browser, showing the snipped Google logo and search box ready to annotate](docs/screenshots/windows/3-editor.webp)
 
-**4. Copy or save.** Ctrl+Enter puts the annotated image on your clipboard, exactly as it looked in the editor:
+**4. Copy or save.** Press Ctrl+C (⌘C on a Mac) and the annotated image is on your clipboard, exactly as it
+looked in the editor:
 
 ![An exported snip: a chart annotated with a red box, an arrow and the label "Best week yet!"](docs/screenshots/result.png)
 
@@ -29,9 +30,9 @@ take the whole screen.
   to select a region, or click once to take the whole screen. **Esc** or right-click cancels.
 - The editor opens straight away, centered on the monitor you snipped, with the snip on the canvas and the
   Selection tool active. The snip is shown in its true colors, exactly as it will be copied or saved.
-- **Copy** (Ctrl+Enter / ⌘↩) puts a PNG on the clipboard and closes the editor. **Save** (Ctrl+S / ⌘S) saves a
-  PNG, and Ctrl+Shift+S / ⇧⌘S saves an `.excalidraw` scene. **Esc** closes the editor and asks first if you have
-  unsaved annotations.
+- **Copy** (Ctrl+C / ⌘C, or Ctrl+Enter / ⌘↩) puts a PNG on the clipboard and closes the editor. While you type
+  in a text box, Ctrl+C / ⌘C copies the text as usual. **Save** (Ctrl+S / ⌘S) saves a PNG, and Ctrl+Shift+S / ⇧⌘S
+  saves an `.excalidraw` scene. **Esc** closes the editor and asks first if you have unsaved annotations.
 - Every raw snip is also saved to `Pictures/SnipDraw/history` (you can turn this off in Settings).
 - Works fully offline. Excalidraw and its fonts are bundled, and the app blocks all network requests.
 

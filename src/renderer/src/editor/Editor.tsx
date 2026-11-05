@@ -24,8 +24,8 @@ const api = window.snipdraw.editor
 const isMac = window.snipdraw.platform === 'darwin'
 /** Shortcut labels as each platform writes them. */
 const KEYS = isMac
-  ? { copy: '⌘↩', save: '⌘S', saveScene: '⇧⌘S' }
-  : { copy: 'Ctrl+Enter', save: 'Ctrl+S', saveScene: 'Ctrl+Shift+S' }
+  ? { copy: '⌘C', save: '⌘S', saveScene: '⇧⌘S' }
+  : { copy: 'Ctrl+C', save: 'Ctrl+S', saveScene: 'Ctrl+Shift+S' }
 
 /** Default annotation color: reads well over most screenshots. */
 const ANNOTATION_COLOR = '#e03131'
@@ -213,7 +213,28 @@ export function Editor(): JSX.Element {
     }
   }, [excalidraw, load])
 
+  // Ctrl+C / ⌘C copies the annotated image, like the Copy button. Listening to
+  // the `copy` event (capture phase, on window) covers the keyboard on Windows
+  // and the Edit-menu key equivalent on macOS, and runs before Excalidraw's own
+  // document-level handler, which would copy the selected shapes instead.
+  // Copying text from a field (an annotation being typed, the hex color box)
+  // keeps working, and shapes can still be copied from the right-click menu.
+  useEffect(() => {
+    const onCopy = (e: ClipboardEvent): void => {
+      const t = e.target as HTMLElement | null
+      const inField = !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)
+      const selectingText = !!window.getSelection()?.toString()
+      if (inField || selectingText || xRef.current?.getAppState().editingTextElement) return
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      void copy()
+    }
+    window.addEventListener('copy', onCopy, true)
+    return () => window.removeEventListener('copy', onCopy, true)
+  }, [copy])
+
   // Shortcuts. Capture phase so we run before Excalidraw's own handlers.
+  // (Ctrl+Enter / ⌘↩ still copies too, for anyone used to it.)
   useEffect(() => {
     const onKey = (e: KeyboardEvent): void => {
       const mod = e.ctrlKey || e.metaKey
