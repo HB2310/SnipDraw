@@ -1,0 +1,39 @@
+name: Bug report
+description: Something doesn't work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead. Screenshots help.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: SnipDraw version
+      placeholder: e.g. 0.1.1
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS (Apple Silicon)
+        - macOS (Intel)
+    validations:
+      required: true
+  - type: textarea
+    id: displays
+    attributes:
+      label: Monitors
+      description: Number of monitors, their resolutions and scaling (e.g. "2560x1440 at 100% + 3840x2160 at 150%").
+  - type: input
+    id: app
+    attributes:
+      label: App you were snipping over (if relevant)
+      placeholder: e.g. a fullscreen game, a browser playing video

@@ -1,0 +1,69 @@
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  user-select: none;
+}
+
+.overlay-root {
+  position: fixed;
+  inset: 0;
+  cursor: crosshair;
+  font: 12px/1.2 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Frozen capture at 1 canvas px per device px, anchored top-left. Its CSS size
+   (bitmap size / devicePixelRatio) is set inline. */
+.capture {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.dim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.selection {
+  position: absolute;
+  outline: 1px solid #6965db;
+  outline-offset: 0;
+  pointer-events: none;
+}
+
+.size-label {
+  position: absolute;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: rgba(20, 20, 24, 0.85);
+  color: #fff;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.hint {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: rgba(20, 20, 24, 0.85);
+  color: #eee;
+  font-size: 13px;
+  pointer-events: none;
+}

@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Typecheck, test, build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  selftest:
+    # Runs the real app with synthetic input on the runner's display. Hosted
+    # runners have unusual displays (and macOS runners can't grant Screen
+    # Recording), so this is informational: check the uploaded report.
+    name: End-to-end self-test (${{ matrix.os }})
+    needs: check
+    continue-on-error: true
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Run self-test against the production bundle
+        shell: bash
+        env:
+          SNIPDRAW_SELFTEST: '1'
+          SNIPDRAW_SELFTEST_OUT: ${{ github.workspace }}/selftest-out
+        run: |
+          npx electron-vite preview --skipBuild 2>&1 | tee selftest.log | grep -E '^\[(selftest|snip|capture|net)\]' || true
+          test -f selftest-out/report.json
+          node -e "const r=require('./selftest-out/report.json'); console.log(JSON.stringify(r.displays)); process.exit(r.ok ? 0 : 1)"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: selftest-${{ matrix.os }}
+          path: |
+            selftest-out/
+            selftest.log
+          if-no-files-found: ignore

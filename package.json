@@ -1,0 +1,59 @@
+{
+  "name": "snipdraw",
+  "productName": "SnipDraw",
+  "version": "0.1.1",
+  "description": "Snip any region of your screen with a hotkey and annotate it instantly in Excalidraw. For Windows and macOS.",
+  "author": {
+    "name": "Hyder Baig",
+    "email": "hyderbaig8@gmail.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/HB2310/SnipDraw#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HB2310/SnipDraw.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HB2310/SnipDraw/issues"
+  },
+  "keywords": [
+    "screenshot",
+    "snipping-tool",
+    "annotation",
+    "excalidraw",
+    "electron",
+    "windows",
+    "macos"
+  ],
+  "private": true,
+  "main": "./out/main/index.js",
+  "scripts": {
+    "fonts": "node scripts/copy-fonts.mjs",
+    "predev": "node scripts/copy-fonts.mjs",
+    "dev": "electron-vite dev",
+    "prebuild": "node scripts/copy-fonts.mjs",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "test": "vitest run",
+    "icon": "node scripts/make-icon.mjs",
+    "dist": "npm run typecheck && npm test && npm run build && electron-builder --win nsis --x64 --publish never",
+    "dist:dir": "npm run build && electron-builder --dir --publish never",
+    "dist:mac": "npm run typecheck && npm test && npm run build && electron-builder --mac dmg --universal --publish never"
+  },
+  "devDependencies": {
+    "@excalidraw/excalidraw": "^0.18.1",
+    "@types/node": "^26.6.6",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^6.2.1",
+    "electron": "^45.2.3",
+    "electron-builder": "^26.18.0",
+    "electron-vite": "^6.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
+  }
+}

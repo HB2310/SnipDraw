@@ -1,0 +1,77 @@
+appId: com.snipdraw.app
+productName: SnipDraw
+copyright: Copyright © 2026 Hyder Baig
+directories:
+  output: dist
+  buildResources: resources
+files:
+  - out/**
+  - package.json
+  - '!**/*.map'
+  # Dev-only self-test (never loaded when packaged).
+  - '!out/main/chunks/selftest-*'
+extraResources:
+  - from: resources
+    to: resources
+    filter:
+      - icon.ico
+      - icon.png
+      - trayTemplate.png
+      - trayTemplate@2x.png
+  - from: .
+    to: .
+    filter:
+      - LICENSE
+      - THIRD_PARTY_NOTICES.md
+asar: true
+# Electron ships ~50 MB of UI locales; the app UI is English only.
+electronLanguages:
+  - en-US
+
+# Releases: pushing a v* tag builds both platforms in GitHub Actions
+# (.github/workflows/release.yml) and uploads them to a draft GitHub release.
+publish:
+  provider: github
+  owner: HB2310
+  repo: SnipDraw
+  releaseType: draft
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: resources/icon.ico
+  executableName: SnipDraw
+  # Not code-signed: Windows SmartScreen will warn on first run (see README).
+  signAndEditExecutable: true
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: SnipDraw
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
+  artifactName: SnipDraw-Setup-${version}.${ext}
+  installerIcon: resources/icon.ico
+  uninstallerIcon: resources/icon.ico
+
+mac:
+  target:
+    # One download for both Apple Silicon and Intel Macs.
+    - target: dmg
+      arch: [universal]
+  icon: resources/icon-mac.png
+  category: public.app-category.productivity
+  # Not notarized: ad-hoc signed ("-") so it runs on Apple Silicon; users approve
+  # it once in System Settings → Privacy & Security (see README).
+  identity: '-'
+  hardenedRuntime: false
+  gatekeeperAssess: false
+  extendInfo:
+    # Menu-bar app: no Dock icon, no app menu bar.
+    LSUIElement: true
+dmg:
+  artifactName: SnipDraw-${version}-mac.${ext}
+  title: SnipDraw ${version}
