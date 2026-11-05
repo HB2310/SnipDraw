@@ -7,20 +7,13 @@ whiteboard editor attached.
 
 Here it is on Windows 11:
 
-**1. Work as usual.** SnipDraw waits in the system tray.
+![SnipDraw demo on Windows 11: snipping part of a browser window and opening it in the editor](docs/screenshots/demo.gif)
 
-![A Windows 11 desktop with a browser open on the Google homepage](docs/screenshots/windows/1-desktop.webp)
+1. **Press Win+Shift+E** anywhere. Every monitor freezes under a dimmed overlay.
+2. **Drag over the part you want**, or click to take the whole screen.
+3. **The editor pops up with your snip**, ready to annotate. Draw, type, highlight: it's a full Excalidraw canvas.
 
-**2. Press Win+Shift+E.** Every monitor freezes under a dimmed overlay. Drag over the part you want, or click to
-take the whole screen.
-
-![The same desktop frozen and dimmed by the SnipDraw overlay, with the hint "Drag to snip · Click for the whole screen · Esc or right-click to cancel"](docs/screenshots/windows/2-snip-overlay.webp)
-
-**3. The editor pops up with your snip**, ready to annotate. Draw, type, highlight: it's a full Excalidraw canvas.
-
-![The SnipDraw editor open next to the browser, showing the snipped Google logo and search box ready to annotate](docs/screenshots/windows/3-editor.webp)
-
-**4. Copy or save.** Press Ctrl+C (⌘C on a Mac) and the annotated image is on your clipboard, exactly as it
+**Copy or save.** Press Ctrl+C (⌘C on a Mac) and the annotated image is on your clipboard, exactly as it
 looked in the editor:
 
 ![An exported snip: a chart annotated with a red box, an arrow and the label "Best week yet!"](docs/screenshots/result.png)
@@ -158,7 +151,7 @@ Windows and macOS runners and uploads the report as an artifact.
 
 ### Screenshots
 
-The Windows walkthrough at the top (`docs/screenshots/windows/`) was captured by hand on a real desktop. The
+The demo GIF at the top (`docs/screenshots/demo.gif`) was recorded by hand on a real Windows desktop. The
 annotated export and the Settings image come from a dev-only script that drives the real app. The script stages a
 neutral demo desktop on one monitor (a wallpaper plus two fictional app windows from `docs/screenshot-demo/`), snips
 part of a window, draws annotations with synthetic input, copies the result and opens Settings. It writes
