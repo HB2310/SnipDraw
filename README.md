@@ -5,17 +5,24 @@ Snip any region of your screen with a global hotkey and annotate it right away i
 or `.excalidraw`. For **Windows** and **macOS**. Think Snipping Tool or the macOS screenshot tool, with a full
 whiteboard editor attached.
 
-**1. Press the hotkey anywhere.** The whole desktop freezes and dims; drag over the part you want.
+Here it is on Windows 11:
 
-![A desktop frozen under the SnipDraw overlay: everything is dimmed except the selected chart, labelled 874 × 366 px](docs/screenshots/overlay.png)
+**1. Work as usual.** SnipDraw waits in the system tray.
 
-**2. Annotate.** The editor pops up right there with your snip, ready to draw on.
+![A Windows 11 desktop with a browser open on the Google homepage](docs/screenshots/windows/1-desktop.webp)
 
-![The SnipDraw editor popped up over the desktop, showing the snipped chart with a red box, an arrow and the label "Best week yet!"](docs/screenshots/editor.png)
+**2. Press Win+Shift+E.** Every monitor freezes under a dimmed overlay. Drag over the part you want, or click to
+take the whole screen.
 
-**3. Copy or save.** One keystroke puts the annotated image on your clipboard, exactly as it looked in the editor:
+![The same desktop frozen and dimmed by the SnipDraw overlay, with the hint "Drag to snip · Click for the whole screen · Esc or right-click to cancel"](docs/screenshots/windows/2-snip-overlay.webp)
 
-![The exported PNG: the chart with the red box, arrow and label](docs/screenshots/result.png)
+**3. The editor pops up with your snip**, Arrow tool ready. Draw, type, highlight: it's a full Excalidraw canvas.
+
+![The SnipDraw editor open next to the browser, showing the snipped Google logo and search box ready to annotate](docs/screenshots/windows/3-editor.webp)
+
+**4. Copy or save.** Ctrl+Enter puts the annotated image on your clipboard, exactly as it looked in the editor:
+
+![An exported snip: a chart annotated with a red box, an arrow and the label "Best week yet!"](docs/screenshots/result.png)
 
 - Lives in the system tray (Windows) or menu bar (macOS). No window at launch.
 - **Win+Shift+E** on Windows or **⇧⌘E** on macOS (configurable) freezes every monitor under a dimmed overlay. Drag
@@ -150,12 +157,12 @@ Windows and macOS runners and uploads the report as an artifact.
 
 ### Screenshots
 
-The images in this README are real captures of the app, made by a dev-only script. It stages a neutral demo
-desktop on one monitor: a wallpaper plus two fictional app windows from `docs/screenshot-demo/`, so no real desktop
-ends up in the repo. Then it snips part of a window, draws the annotations with synthetic input, copies the result
-and opens Settings. The overlay and editor shots are full-monitor captures. It writes everything to
-`docs/screenshots/`. Quit any installed SnipDraw first (it would hold the hotkey), keep your hands off the mouse
-for about 20 seconds, then run:
+The Windows walkthrough at the top (`docs/screenshots/windows/`) was captured by hand on a real desktop. The
+annotated export and the Settings image come from a dev-only script that drives the real app. The script stages a
+neutral demo desktop on one monitor (a wallpaper plus two fictional app windows from `docs/screenshot-demo/`), snips
+part of a window, draws annotations with synthetic input, copies the result and opens Settings. It writes
+`overlay.png`, `editor.png`, `result.png` and `settings.png` to `docs/screenshots/`. Quit any installed SnipDraw
+first (it would hold the hotkey), keep your hands off the mouse for about 20 seconds, then run:
 
 ```bash
 npm run build
