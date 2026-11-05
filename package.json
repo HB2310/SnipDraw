@@ -1,7 +1,7 @@
 {
   "name": "snipdraw",
   "productName": "SnipDraw",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Snip any region of your screen with a hotkey and annotate it instantly in Excalidraw. For Windows and macOS.",
   "author": {
     "name": "Hyder Baig",
