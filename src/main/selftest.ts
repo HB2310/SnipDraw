@@ -71,6 +71,9 @@ export async function runSelfTest(ctx: Ctx): Promise<void> {
         ctx.snips.onSnipComplete = resolve
         void (async () => {
           try {
+            // Give the previous case's hidden editor time to leave the screen. Capturing
+            // straight after hide() gave a frame that didn't match the overlay's on macOS.
+            await sleep(1000)
             // Reference frame (taken before the overlay is up) to verify dimming against.
             const reference = await captureAllDisplays()
             const tStart = performance.now()
