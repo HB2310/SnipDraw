@@ -8,8 +8,9 @@ files:
   - out/**
   - package.json
   - '!**/*.map'
-  # Dev-only self-test (never loaded when packaged).
+  # Dev-only self-test and screenshot tools (never loaded when packaged).
   - '!out/main/chunks/selftest-*'
+  - '!out/main/chunks/screenshots-*'
 extraResources:
   - from: resources
     to: resources

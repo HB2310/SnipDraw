@@ -139,6 +139,8 @@ if (!app.requestSingleInstanceLock()) {
 
     if (process.env.SNIPDRAW_SELFTEST && !app.isPackaged) {
       void import('./selftest').then((m) => m.runSelfTest({ snips, overlays, editor, hotkeyError: err }))
+    } else if (process.env.SNIPDRAW_SCREENSHOTS && !app.isPackaged) {
+      void import('./screenshots').then((m) => m.runScreenshots({ snips, overlays, editor }))
     }
   })
 }

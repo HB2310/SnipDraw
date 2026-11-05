@@ -4,6 +4,12 @@ Snip any region of your screen with a global hotkey and annotate it right away i
 [Excalidraw](https://github.com/excalidraw/excalidraw) editor. Copy the result to the clipboard, or save it as PNG
 or `.excalidraw`. For **Windows** and **macOS**.
 
+![The SnipDraw editor: a snip of a dashboard annotated with a hand-drawn box, an arrow and a label](docs/screenshots/editor.png)
+
+| 1. Press the hotkey and drag over any part of the screen | 2. Copy or save: the PNG matches the editor exactly |
+| --- | --- |
+| ![Snip overlay: the screen is frozen and dimmed, with a highlighted selection and its size in pixels](docs/screenshots/overlay.png) | ![The exported PNG with the annotations](docs/screenshots/result.png) |
+
 - Lives in the system tray (Windows) or menu bar (macOS). No window at launch.
 - **Win+Shift+E** on Windows or **⇧⌘E** on macOS (configurable) freezes every monitor under a dimmed overlay. Drag
   to select a region, or click once to take the whole screen. **Esc** or right-click cancels.
@@ -43,6 +49,8 @@ Because the Mac build is ad-hoc signed, macOS may ask for Screen Recording permi
 update.
 
 ## Changing the hotkey
+
+<img src="docs/screenshots/settings.png" alt="SnipDraw settings: hotkey, start at login, auto-save history and PNG size" width="380" align="right" />
 
 Open **Settings…** from the tray or menu-bar icon. Under **Snip hotkey**, either:
 
@@ -133,6 +141,23 @@ To test the production bundle (app:// protocol and strict CSP), run `npm run bui
 folder, next to screenshots of the overlay, editor, crop and clipboard. CI also runs this test on GitHub's
 Windows and macOS runners and uploads the report as an artifact.
 
+### Screenshots
+
+The images in this README are real captures of the app, made by a dev-only script. It covers one monitor with a
+fictional demo page (`docs/screenshot-demo.html`), snips it, draws the annotations with synthetic input, copies the
+result and opens Settings. It writes everything to `docs/screenshots/`. Quit any installed SnipDraw first (it would
+hold the hotkey), keep your hands off the mouse for about 20 seconds, then run:
+
+```bash
+npm run build
+```
+
+```bash
+SNIPDRAW_SCREENSHOTS=1 npx electron-vite preview --skipBuild
+```
+
+It prefers a 16:9 monitor at 100% scaling. Set `SNIPDRAW_SCREENSHOT_DISPLAY=<display id>` to choose a different one.
+
 ### Packaging
 
 ```bash
@@ -214,8 +239,8 @@ pixel larger than its monitor.
 
 ## Known limitations
 
-- **macOS support is new.** The Mac code paths are built and exercised in CI on GitHub's Mac runners, but haven't
-  had much real-world use yet. Bug reports are very welcome.
+- **macOS support is new.** On GitHub's Mac runners, the self-test's capture, overlay, crop, editor and copy
+  checks all pass, pixel-exact, but the app hasn't had much real-world use on Macs yet. Bug reports are very welcome.
 - **DRM-protected video** (Netflix, Disney+, some browsers' protected playback) shows up black in captures. The
   OS and GPU driver enforce this.
 - **Exclusive-fullscreen games** on Windows (true fullscreen, not borderless/windowed-fullscreen) may minimize or

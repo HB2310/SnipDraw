@@ -25,9 +25,9 @@ interface Ctx {
   hotkeyError: string | null
 }
 
-const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms))
+export const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms))
 
-async function until(fn: () => boolean, timeoutMs: number, label: string): Promise<void> {
+export async function until(fn: () => boolean, timeoutMs: number, label: string): Promise<void> {
   const t0 = Date.now()
   while (!fn()) {
     if (Date.now() - t0 > timeoutMs) throw new Error(`timeout waiting for ${label}`)
@@ -199,7 +199,7 @@ export async function runSelfTest(ctx: Ctx): Promise<void> {
   app.exit(report.ok ? 0 : 1)
 }
 
-async function drag(win: BrowserWindow, x0: number, y0: number, x1: number, y1: number): Promise<void> {
+export async function drag(win: BrowserWindow, x0: number, y0: number, x1: number, y1: number): Promise<void> {
   const wc = win.webContents
   wc.sendInputEvent({ type: 'mouseMove', x: x0, y: y0 })
   wc.sendInputEvent({ type: 'mouseDown', x: x0, y: y0, button: 'left', clickCount: 1 })
@@ -213,7 +213,7 @@ async function drag(win: BrowserWindow, x0: number, y0: number, x1: number, y1: 
   await sleep(100)
 }
 
-async function mouseUp(win: BrowserWindow, x: number, y: number): Promise<void> {
+export async function mouseUp(win: BrowserWindow, x: number, y: number): Promise<void> {
   win.webContents.sendInputEvent({ type: 'mouseUp', x, y, button: 'left', clickCount: 1 })
 }
 
@@ -300,7 +300,7 @@ function pixelDiff(a: Electron.NativeImage, b: Electron.NativeImage): { max: num
   return { max, mean: Number((sum / n).toFixed(3)), sizeMatch: true }
 }
 
-async function readClipboardPng(): Promise<Electron.NativeImage> {
+export async function readClipboardPng(): Promise<Electron.NativeImage> {
   const items = await clipboard.read()
   for (const item of items) {
     if (item.types.includes('image/png')) {
@@ -315,7 +315,7 @@ async function readClipboardPng(): Promise<Electron.NativeImage> {
  * Copy the clipboard's contents into fresh ClipboardItems: Electron refuses to
  * write back the items returned by clipboard.read() directly.
  */
-async function snapshotClipboard(): Promise<ClipboardItem[]> {
+export async function snapshotClipboard(): Promise<ClipboardItem[]> {
   const out: ClipboardItem[] = []
   for (const item of await clipboard.read().catch(() => [])) {
     const data: Record<string, Blob> = {}

@@ -1,0 +1,140 @@
+<!doctype html>
+<!--
+  Neutral, fictional page that the screenshot script (src/main/screenshots.ts)
+  puts on screen before snipping, so README images never show a real desktop.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'" />
+    <title>Orbit demo</title>
+    <style>
+      :root {
+        --bg: #f4f6fb;
+        --card: #ffffff;
+        --ink: #1d2433;
+        --muted: #6b7489;
+        --line: #e4e8f1;
+        --accent: #4f6bed;
+        --good: #1f9d6b;
+        --warn: #d9822b;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        background: var(--bg);
+        color: var(--ink);
+        font: 15px/1.45 'Segoe UI', -apple-system, system-ui, sans-serif;
+        overflow: hidden;
+      }
+      aside {
+        background: #1d2433;
+        color: #c9d1e3;
+        padding: 28px 18px;
+      }
+      .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; color: #fff; margin-bottom: 34px; }
+      .logo i { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #7c8cff, #4f6bed); display: inline-block; }
+      nav a { display: block; padding: 10px 12px; border-radius: 8px; color: inherit; text-decoration: none; margin-bottom: 4px; }
+      nav a.on { background: rgba(255, 255, 255, 0.1); color: #fff; }
+      main { padding: 34px 44px; overflow: hidden; }
+      header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 26px; }
+      h1 { font-size: 30px; margin: 0; }
+      .sub { color: var(--muted); }
+      .pill { background: #e7ebff; color: var(--accent); padding: 6px 12px; border-radius: 999px; font-weight: 600; font-size: 13px; }
+      #snip-target { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1180px; }
+      .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; }
+      .kpi .label { color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
+      .kpi .value { font-size: 34px; font-weight: 700; margin: 6px 0 2px; }
+      .kpi .delta { font-size: 13px; font-weight: 600; }
+      .up { color: var(--good); }
+      .down { color: var(--warn); }
+      .chart { grid-column: 1 / span 3; }
+      .chart h2, .list h2 { font-size: 17px; margin: 0 0 16px; }
+      .bars { display: flex; align-items: flex-end; gap: 14px; height: 230px; border-bottom: 1px solid var(--line); padding: 0 6px; }
+      .bars div { flex: 1; border-radius: 6px 6px 0 0; background: #c8d1fb; }
+      .bars div.peak { background: var(--accent); }
+      .weeks { display: flex; gap: 14px; padding: 8px 6px 0; color: var(--muted); font-size: 12px; }
+      .weeks span { flex: 1; text-align: center; }
+      .list ul { list-style: none; padding: 0; margin: 0; }
+      .list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); }
+      .list li:last-child { border-bottom: 0; }
+      .tag { font-size: 12px; padding: 2px 8px; border-radius: 6px; background: #eef1f7; color: var(--muted); }
+      .tag.done { background: #e3f6ee; color: var(--good); }
+    </style>
+  </head>
+  <body>
+    <aside>
+      <div class="logo"><i></i>Orbit</div>
+      <nav>
+        <a class="on">Overview</a>
+        <a>Releases</a>
+        <a>Issues</a>
+        <a>Team</a>
+        <a>Settings</a>
+      </nav>
+    </aside>
+    <main>
+      <header>
+        <div>
+          <h1>Weekly overview</h1>
+          <div class="sub">Demo project · last 12 weeks</div>
+        </div>
+        <span class="pill">Sample data</span>
+      </header>
+      <section id="snip-target">
+        <div class="card kpi" id="kpi-highlight">
+          <div class="label">Active users</div>
+          <div class="value">18,420</div>
+          <div class="delta up">▲ 12.4% vs last week</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">Releases</div>
+          <div class="value">7</div>
+          <div class="delta up">▲ 2 this month</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">Open issues</div>
+          <div class="value">23</div>
+          <div class="delta down">▼ 5 since Monday</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">Build time</div>
+          <div class="value">3m 41s</div>
+          <div class="delta up">▲ 18% faster</div>
+        </div>
+        <div class="card chart">
+          <h2>Weekly active users</h2>
+          <div class="bars">
+            <div style="height: 38%"></div>
+            <div style="height: 44%"></div>
+            <div style="height: 41%"></div>
+            <div style="height: 52%"></div>
+            <div style="height: 49%"></div>
+            <div style="height: 58%"></div>
+            <div style="height: 63%"></div>
+            <div style="height: 60%"></div>
+            <div style="height: 71%"></div>
+            <div style="height: 68%"></div>
+            <div style="height: 77%"></div>
+            <div style="height: 92%" class="peak" id="bar-peak"></div>
+          </div>
+          <div class="weeks">
+            <span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span>
+            <span>W7</span><span>W8</span><span>W9</span><span>W10</span><span>W11</span><span>W12</span>
+          </div>
+        </div>
+        <div class="card list">
+          <h2>This week</h2>
+          <ul>
+            <li>Dark mode polish <span class="tag done">Done</span></li>
+            <li>Faster exports <span class="tag done">Done</span></li>
+            <li>Keyboard shortcuts <span class="tag">In review</span></li>
+            <li>Onboarding tour <span class="tag">Planned</span></li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
