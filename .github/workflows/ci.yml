@@ -48,6 +48,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # npm may skip Electron's install script; the self-test needs the binary.
+      - name: Download the Electron binary
+        run: node node_modules/electron/install.js
       - run: npm run build
       - name: Run self-test against the production bundle
         shell: bash
