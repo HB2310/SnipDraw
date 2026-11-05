@@ -1,7 +1,8 @@
 <!doctype html>
 <!--
-  Neutral, fictional page that the screenshot script (src/main/screenshots.ts)
-  puts on screen before snipping, so README images never show a real desktop.
+  Fictional app window for the README screenshots (src/main/screenshots.ts).
+  Shown in a transparent frameless window that draws its own neutral chrome,
+  on top of wallpaper.html, so the images never show a real desktop.
 -->
 <html lang="en">
   <head>
@@ -20,15 +21,13 @@
         --warn: #d9822b;
       }
       * { box-sizing: border-box; }
-      html, body { margin: 0; height: 100%; }
-      body {
-        display: grid;
-        grid-template-columns: 250px 1fr;
-        background: var(--bg);
-        color: var(--ink);
-        font: 15px/1.45 'Segoe UI', -apple-system, system-ui, sans-serif;
-        overflow: hidden;
-      }
+      html, body { margin: 0; height: 100%; background: transparent; }
+      body { padding: 24px; color: var(--ink); font: 15px/1.45 'Segoe UI', -apple-system, system-ui, sans-serif; overflow: hidden; }
+      .window { height: 100%; display: flex; flex-direction: column; border-radius: 10px; overflow: hidden; background: var(--bg); box-shadow: 0 14px 44px rgba(0, 0, 0, 0.38), 0 0 0 1px rgba(0, 0, 0, 0.12); }
+      .titlebar { flex: none; height: 36px; display: flex; align-items: center; justify-content: space-between; padding-left: 14px; background: #fff; border-bottom: 1px solid var(--line); font-size: 13px; color: #3b4252; }
+      .ctl { display: flex; color: #4b5263; font-size: 13px; }
+      .ctl span { width: 46px; height: 36px; display: grid; place-items: center; }
+      .app { flex: 1; min-height: 0; display: grid; grid-template-columns: 250px 1fr; }
       aside {
         background: #1d2433;
         color: #c9d1e3;
@@ -65,6 +64,9 @@
     </style>
   </head>
   <body>
+    <div class="window">
+    <div class="titlebar"><span>Orbit — Weekly overview</span><span class="ctl"><span>—</span><span>☐</span><span>✕</span></span></div>
+    <div class="app">
     <aside>
       <div class="logo"><i></i>Orbit</div>
       <nav>
@@ -104,7 +106,7 @@
           <div class="value">3m 41s</div>
           <div class="delta up">▲ 18% faster</div>
         </div>
-        <div class="card chart">
+        <div class="card chart" id="chart-card">
           <h2>Weekly active users</h2>
           <div class="bars">
             <div style="height: 38%"></div>
@@ -136,5 +138,7 @@
         </div>
       </section>
     </main>
+    </div>
+    </div>
   </body>
 </html>

@@ -2,16 +2,19 @@
  * Dev-only README screenshot generator (excluded from the installer):
  *   SNIPDRAW_SCREENSHOTS=1 npx electron-vite preview --skipBuild
  *
- * Covers one monitor with docs/screenshot-demo.html (fictional sample data, so
- * no real desktop ends up in the repo), then drives the real app with
- * synthetic input: snip a region, draw annotations in the editor, copy, open
- * Settings. Writes docs/screenshots/{overlay,editor,result,settings}.png.
- * Keep your hands off the mouse while it runs (about 15 seconds).
+ * Stages a neutral demo desktop on one monitor (docs/screenshot-demo/: a
+ * wallpaper plus two fictional app windows, so no real desktop ends up in the
+ * repo), then drives the real app with synthetic input: snip part of a window,
+ * draw annotations in the editor, copy, open Settings. The overlay and editor
+ * shots are full-monitor captures, so they show SnipDraw over the desktop the
+ * way you actually see it. Writes docs/screenshots/{overlay,editor,result,settings}.png.
+ * Keep your hands off the mouse while it runs (about 20 seconds).
  */
 import { app, BrowserWindow, clipboard, screen, type Display, type NativeImage } from 'electron'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fitImage, sceneImageSize } from '../shared/geometry'
+import { captureAllDisplays } from './capture'
 import { overrideConfig } from './config'
 import type { EditorWindow } from './editor'
 import type { OverlayManager } from './overlay'
@@ -27,50 +30,82 @@ interface Ctx {
 }
 
 type Box = { x: number; y: number; width: number; height: number }
+type Point = { x: number; y: number }
 
 const MAX_WIDTH = 1600
 
 export async function runScreenshots(ctx: Ctx): Promise<void> {
   const root = app.getAppPath()
+  const demoDir = join(root, 'docs', 'screenshot-demo')
   const out = join(root, 'docs', 'screenshots')
   mkdirSync(out, { recursive: true })
   app.setPath('pictures', join(app.getPath('temp'), 'snipdraw-screenshots'))
   overrideConfig({ autoSaveHistory: false, exportScale: 'native' })
   const savedClipboard = await snapshotClipboard()
-  let demo: BrowserWindow | null = null
+  const staged: BrowserWindow[] = []
   let ok = false
 
   try {
     await sleep(2500) // let the overlay and editor pages boot
     const target = pickDisplay()
-    console.log(`[shots] using display ${target.id} ${target.bounds.width}x${target.bounds.height} @${target.scaleFactor}`)
+    const b = target.bounds
+    console.log(`[shots] using display ${target.id} ${b.width}x${b.height} @${target.scaleFactor}`)
 
-    // 1. Neutral demo content over the whole target monitor.
-    demo = new BrowserWindow({
-      ...target.bounds,
-      show: false,
-      frame: false,
-      resizable: false,
-      skipTaskbar: true,
-      enableLargerThanScreen: true,
-      backgroundColor: '#f4f6fb',
-      webPreferences: { sandbox: true, contextIsolation: true }
+    // 1. Demo desktop: wallpaper over the whole monitor (taskbar included),
+    //    then two app windows that draw their own neutral chrome.
+    const sx = b.width / 2560
+    const sy = b.height / 1440
+    const at = (x: number, y: number, w: number, h: number): Box => ({
+      x: Math.round(b.x + x * sx),
+      y: Math.round(b.y + y * sy),
+      width: Math.round(w * sx),
+      height: Math.round(h * sy)
     })
-    demo.setAlwaysOnTop(true, 'pop-up-menu') // above apps, below SnipDraw's overlay
-    await demo.loadFile(join(root, 'docs', 'screenshot-demo.html'))
-    placeWindow(demo, target.bounds)
-    demo.show()
-    await sleep(900)
-    const rect = (id: string): Promise<Box> =>
-      demo!.webContents.executeJavaScript(
+    const stage = async (page: string, rect: Box, transparent: boolean): Promise<BrowserWindow> => {
+      const w = new BrowserWindow({
+        ...rect,
+        show: false,
+        frame: false,
+        transparent,
+        backgroundColor: transparent ? '#00000000' : '#1b1f3b',
+        resizable: false,
+        skipTaskbar: true,
+        hasShadow: false,
+        roundedCorners: false,
+        enableLargerThanScreen: true,
+        webPreferences: { sandbox: true, contextIsolation: true }
+      })
+      w.setAlwaysOnTop(true, 'pop-up-menu') // above other apps, below SnipDraw's overlay
+      await w.loadFile(join(demoDir, page))
+      placeWindow(w, rect)
+      w.showInactive()
+      staged.push(w)
+      return w
+    }
+    await stage('wallpaper.html', { ...b }, false)
+    const dashRect = at(140, 100, 1520, 960)
+    const dash = await stage('dashboard.html', dashRect, true)
+    await stage('notes.html', at(1570, 360, 760, 620), true)
+    await sleep(1000)
+
+    // Element rects in monitor coordinates (= overlay viewport coordinates).
+    const rect = async (id: string): Promise<Box> => {
+      const r: Box = await dash.webContents.executeJavaScript(
         `(() => { const b = document.getElementById(${JSON.stringify(id)}).getBoundingClientRect(); return { x: b.x, y: b.y, width: b.width, height: b.height } })()`
       )
-    const area = await rect('snip-target')
-    const kpi = await rect('kpi-highlight')
+      return { ...r, x: r.x + dashRect.x - b.x, y: r.y + dashRect.y - b.y }
+    }
+    const chart = await rect('chart-card')
     const peak = await rect('bar-peak')
-    const sel: Box = { x: Math.round(area.x - 18), y: Math.round(area.y - 18), width: Math.round(area.width + 36), height: Math.round(area.height + 36) }
+    const pad = 14
+    const sel: Box = {
+      x: Math.round(chart.x - pad),
+      y: Math.round(chart.y - pad),
+      width: Math.round(chart.width + pad * 2),
+      height: Math.round(chart.height + pad * 2)
+    }
 
-    // 2. Snip: overlay mid-drag, then release.
+    // 2. Snip: capture the desktop mid-drag, then release.
     const result = await new Promise<SnipResult>((resolve, reject) => {
       ctx.snips.onSnipComplete = resolve
       void (async () => {
@@ -78,14 +113,11 @@ export async function runScreenshots(ctx: Ctx): Promise<void> {
           await ctx.snips.start()
           const ow = ctx.overlays.getWindow(target.id)
           if (!ow?.isVisible()) throw new Error('overlay not visible')
+          // Let the editor (a normal window) open above the demo windows later.
+          for (const w of staged) w.setAlwaysOnTop(false)
           await drag(ow, sel.x, sel.y, sel.x + sel.width, sel.y + sel.height)
-          await sleep(250)
-          // Crop to the content (the demo page only fills the left of a wide monitor), 16:9.
-          const full = await ow.webContents.capturePage()
-          const k = full.getSize().width / target.bounds.width
-          const w = Math.min(full.getSize().width, Math.round((sel.x + sel.width + 280) * k))
-          const h = Math.min(full.getSize().height, Math.round((w * 9) / 16))
-          save(out, 'overlay.png', full.crop({ x: 0, y: 0, width: w, height: h }))
+          await sleep(300)
+          save(out, 'overlay.png', await captureMonitor(target))
           await mouseUp(ow, sel.x + sel.width, sel.y + sel.height)
         } catch (err) {
           reject(err)
@@ -101,8 +133,8 @@ export async function runScreenshots(ctx: Ctx): Promise<void> {
     const [cw, ch] = ew.getContentSize()
     const img = sceneImageSize({ width: result.rect.width, height: result.rect.height }, target.scaleFactor)
     const view = fitImage(img, { width: cw, height: ch }, target.scaleFactor)
-    // demo-page (= screen DIP) coordinates -> editor viewport coordinates
-    const toEditor = (x: number, y: number): { x: number; y: number } => ({
+    // monitor coordinates -> editor viewport coordinates
+    const toEditor = (x: number, y: number): Point => ({
       x: Math.round((-img.width / 2 + (x - sel.x) + view.scrollX) * view.zoom),
       y: Math.round((-img.height / 2 + (y - sel.y) + view.scrollY) * view.zoom)
     })
@@ -113,47 +145,45 @@ export async function runScreenshots(ctx: Ctx): Promise<void> {
       wc.sendInputEvent({ type: 'keyUp', keyCode })
       await sleep(120)
     }
-    const stroke = async (a: { x: number; y: number }, b: { x: number; y: number }): Promise<void> => {
+    const click = async (p: Point): Promise<void> => {
+      wc.sendInputEvent({ type: 'mouseDown', x: p.x, y: p.y, button: 'left', clickCount: 1 })
+      wc.sendInputEvent({ type: 'mouseUp', x: p.x, y: p.y, button: 'left', clickCount: 1 })
+      await sleep(250)
+    }
+    const stroke = async (a: Point, z: Point): Promise<void> => {
       wc.sendInputEvent({ type: 'mouseMove', x: a.x, y: a.y })
       wc.sendInputEvent({ type: 'mouseDown', x: a.x, y: a.y, button: 'left', clickCount: 1 })
       for (let i = 1; i <= 12; i++) {
-        const x = Math.round(a.x + ((b.x - a.x) * i) / 12)
-        const y = Math.round(a.y + ((b.y - a.y) * i) / 12)
+        const x = Math.round(a.x + ((z.x - a.x) * i) / 12)
+        const y = Math.round(a.y + ((z.y - a.y) * i) / 12)
         wc.sendInputEvent({ type: 'mouseMove', x, y, button: 'left', modifiers: ['leftbuttondown'] })
         await sleep(16)
       }
-      wc.sendInputEvent({ type: 'mouseUp', x: b.x, y: b.y, button: 'left', clickCount: 1 })
+      wc.sendInputEvent({ type: 'mouseUp', x: z.x, y: z.y, button: 'left', clickCount: 1 })
       await sleep(200)
     }
 
-    // Rectangle around the first KPI card.
+    // Box around the peak bar, an arrow pointing at it, and a label.
     await key('r')
-    await stroke(toEditor(kpi.x - 8, kpi.y - 8), toEditor(kpi.x + kpi.width + 8, kpi.y + kpi.height + 8))
-    // Arrow pointing at the peak bar.
-    const tip = toEditor(peak.x + peak.width / 2, peak.y + 6)
-    const tail = { x: tip.x - 230, y: tip.y - 40 }
+    await stroke(toEditor(peak.x - 10, peak.y - 12), toEditor(peak.x + peak.width + 10, peak.y + peak.height + 4))
+    const tip = toEditor(peak.x - 16, peak.y + 28)
+    const tail = { x: tip.x - 220, y: tip.y - 20 }
     await key('a')
     await stroke(tail, tip)
-    // Label at the arrow's tail.
     await key('t')
-    const at = { x: tail.x - 175, y: tail.y - 30 }
-    wc.sendInputEvent({ type: 'mouseDown', x: at.x, y: at.y, button: 'left', clickCount: 1 })
-    wc.sendInputEvent({ type: 'mouseUp', x: at.x, y: at.y, button: 'left', clickCount: 1 })
-    await sleep(300)
-    for (const ch of 'Best week yet!') {
-      wc.sendInputEvent({ type: 'char', keyCode: ch })
+    await click({ x: tail.x - 190, y: tail.y - 14 })
+    for (const c of 'Best week yet!') {
+      wc.sendInputEvent({ type: 'char', keyCode: c })
       await sleep(15)
     }
     await sleep(200)
     await key('Escape') // finish the text
     // Click empty canvas (right of the hint line, above the image) to deselect,
     // then pick the Arrow tool again: the editor's state right after a snip.
-    wc.sendInputEvent({ type: 'mouseDown', x: cw - 60, y: 75, button: 'left', clickCount: 1 })
-    wc.sendInputEvent({ type: 'mouseUp', x: cw - 60, y: 75, button: 'left', clickCount: 1 })
-    await sleep(200)
+    await click({ x: cw - 60, y: 75 })
     await key('a')
-    await sleep(500)
-    save(out, 'editor.png', await wc.capturePage())
+    await sleep(600)
+    save(out, 'editor.png', await captureMonitor(target))
 
     // 4. Copy: the exported PNG is the "result" image.
     wc.sendInputEvent({ type: 'keyDown', keyCode: 'Enter', modifiers: ['control'] })
@@ -173,10 +203,17 @@ export async function runScreenshots(ctx: Ctx): Promise<void> {
   } catch (err) {
     console.error('[shots] failed:', err)
   } finally {
-    demo?.destroy()
+    for (const w of staged) if (!w.isDestroyed()) w.destroy()
     if (savedClipboard.length) await clipboard.write(savedClipboard).catch(() => undefined)
     app.exit(ok ? 0 : 1)
   }
+}
+
+/** Full-resolution capture of one monitor, through the same path snips use. */
+async function captureMonitor(display: Display): Promise<NativeImage> {
+  const shot = (await captureAllDisplays()).get(display.id)
+  if (!shot) throw new Error(`could not capture display ${display.id}`)
+  return shot.image
 }
 
 /** Prefer a 16:9 monitor at 100% (crisp, README-friendly); else the primary display. */

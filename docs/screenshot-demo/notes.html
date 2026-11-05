@@ -1,0 +1,42 @@
+<!doctype html>
+<!-- Fictional notes window for the README screenshots (src/main/screenshots.ts). -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'" />
+    <title>Notes demo</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: transparent; }
+      body { padding: 24px; font: 15px/1.6 'Segoe UI', -apple-system, system-ui, sans-serif; color: #2b2b2b; overflow: hidden; }
+      .window { height: 100%; display: flex; flex-direction: column; border-radius: 10px; overflow: hidden; background: #fffdf6; box-shadow: 0 14px 44px rgba(0, 0, 0, 0.38), 0 0 0 1px rgba(0, 0, 0, 0.12); }
+      .titlebar { flex: none; height: 36px; display: flex; align-items: center; justify-content: space-between; padding-left: 14px; background: #fff7dc; border-bottom: 1px solid #efe4c2; font-size: 13px; color: #5a5140; }
+      .ctl { display: flex; color: #6b624f; font-size: 13px; }
+      .ctl span { width: 46px; height: 36px; display: grid; place-items: center; }
+      .page { padding: 26px 32px; }
+      h1 { font-size: 22px; margin: 0 0 14px; }
+      ul { padding-left: 0; list-style: none; margin: 0 0 18px; }
+      li { padding: 6px 0; display: flex; gap: 10px; align-items: center; }
+      .box { width: 16px; height: 16px; border: 2px solid #b9ac86; border-radius: 4px; flex: none; }
+      .box.on { background: #e0b84a; border-color: #e0b84a; }
+      .done { color: #9a9282; text-decoration: line-through; }
+      p { color: #6d6555; margin: 0; }
+    </style>
+  </head>
+  <body>
+    <div class="window">
+      <div class="titlebar"><span>Notes — Release checklist</span><span class="ctl"><span>—</span><span>☐</span><span>✕</span></span></div>
+      <div class="page">
+        <h1>Release checklist</h1>
+        <ul>
+          <li><span class="box on"></span><span class="done">Freeze the feature branch</span></li>
+          <li><span class="box on"></span><span class="done">Update the changelog</span></li>
+          <li><span class="box"></span>Screenshot the new dashboard</li>
+          <li><span class="box"></span>Send the weekly numbers to the team</li>
+          <li><span class="box"></span>Tag the release</li>
+        </ul>
+        <p>Tip: snip the chart, circle the highlight, paste it into the update.</p>
+      </div>
+    </div>
+  </body>
+</html>

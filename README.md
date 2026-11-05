@@ -2,13 +2,20 @@
 
 Snip any region of your screen with a global hotkey and annotate it right away in an embedded
 [Excalidraw](https://github.com/excalidraw/excalidraw) editor. Copy the result to the clipboard, or save it as PNG
-or `.excalidraw`. For **Windows** and **macOS**.
+or `.excalidraw`. For **Windows** and **macOS**. Think Snipping Tool or the macOS screenshot tool, with a full
+whiteboard editor attached.
 
-![The SnipDraw editor: a snip of a dashboard annotated with a hand-drawn box, an arrow and a label](docs/screenshots/editor.png)
+**1. Press the hotkey anywhere.** The whole desktop freezes and dims; drag over the part you want.
 
-| 1. Press the hotkey and drag over any part of the screen | 2. Copy or save: the PNG matches the editor exactly |
-| --- | --- |
-| ![Snip overlay: the screen is frozen and dimmed, with a highlighted selection and its size in pixels](docs/screenshots/overlay.png) | ![The exported PNG with the annotations](docs/screenshots/result.png) |
+![A desktop frozen under the SnipDraw overlay: everything is dimmed except the selected chart, labelled 874 × 366 px](docs/screenshots/overlay.png)
+
+**2. Annotate.** The editor pops up right there with your snip, ready to draw on.
+
+![The SnipDraw editor popped up over the desktop, showing the snipped chart with a red box, an arrow and the label "Best week yet!"](docs/screenshots/editor.png)
+
+**3. Copy or save.** One keystroke puts the annotated image on your clipboard, exactly as it looked in the editor:
+
+![The exported PNG: the chart with the red box, arrow and label](docs/screenshots/result.png)
 
 - Lives in the system tray (Windows) or menu bar (macOS). No window at launch.
 - **Win+Shift+E** on Windows or **⇧⌘E** on macOS (configurable) freezes every monitor under a dimmed overlay. Drag
@@ -143,10 +150,12 @@ Windows and macOS runners and uploads the report as an artifact.
 
 ### Screenshots
 
-The images in this README are real captures of the app, made by a dev-only script. It covers one monitor with a
-fictional demo page (`docs/screenshot-demo.html`), snips it, draws the annotations with synthetic input, copies the
-result and opens Settings. It writes everything to `docs/screenshots/`. Quit any installed SnipDraw first (it would
-hold the hotkey), keep your hands off the mouse for about 20 seconds, then run:
+The images in this README are real captures of the app, made by a dev-only script. It stages a neutral demo
+desktop on one monitor: a wallpaper plus two fictional app windows from `docs/screenshot-demo/`, so no real desktop
+ends up in the repo. Then it snips part of a window, draws the annotations with synthetic input, copies the result
+and opens Settings. The overlay and editor shots are full-monitor captures. It writes everything to
+`docs/screenshots/`. Quit any installed SnipDraw first (it would hold the hotkey), keep your hands off the mouse
+for about 20 seconds, then run:
 
 ```bash
 npm run build
