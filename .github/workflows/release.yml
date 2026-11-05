@@ -6,14 +6,28 @@ name: Release
 on:
   push:
     tags: ['v*']
-  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
+  draft:
+    name: Create draft release
+    runs-on: ubuntu-latest
+    steps:
+      # One job creates the draft so the platform builds can't race to create two.
+      - name: Create the draft (if it doesn't exist yet)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 ||
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --verify-tag \
+              --title "SnipDraw ${TAG#v}" --generate-notes
+
   build:
     name: Build ${{ matrix.name }}
+    needs: draft
     strategy:
       fail-fast: false
       matrix:
@@ -21,9 +35,11 @@ jobs:
           - name: Windows
             os: windows-latest
             args: --win nsis --x64
+            files: dist/*.exe
           - name: macOS
             os: macos-latest
             args: --mac dmg --universal
+            files: dist/*.dmg
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -35,7 +51,9 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
-      - name: Package and upload to the draft release
-        run: npx electron-builder ${{ matrix.args }} --publish always
+      - run: npx electron-builder ${{ matrix.args }} --publish never
+      - name: Upload the installer to the draft release
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.ref_name }}" ${{ matrix.files }} --repo "$GITHUB_REPOSITORY" --clobber

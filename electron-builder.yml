@@ -29,14 +29,6 @@ asar: true
 electronLanguages:
   - en-US
 
-# Releases: pushing a v* tag builds both platforms in GitHub Actions
-# (.github/workflows/release.yml) and uploads them to a draft GitHub release.
-publish:
-  provider: github
-  owner: HB2310
-  repo: SnipDraw
-  releaseType: draft
-
 win:
   target:
     - target: nsis
