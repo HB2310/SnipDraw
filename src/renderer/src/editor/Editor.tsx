@@ -123,7 +123,7 @@ export function Editor(): JSX.Element {
       })
       x.addFiles([file])
       x.history.clear()
-      x.setActiveTool({ type: 'arrow' })
+      x.setActiveTool({ type: 'selection' })
       const view = center({ width: window.innerWidth, height: window.innerHeight })
       markClean()
       // Only tell main to show the window once the real pixels are on the

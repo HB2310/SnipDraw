@@ -179,9 +179,9 @@ export async function runScreenshots(ctx: Ctx): Promise<void> {
     await sleep(200)
     await key('Escape') // finish the text
     // Click empty canvas (right of the hint line, above the image) to deselect,
-    // then pick the Arrow tool again: the editor's state right after a snip.
+    // then pick the Selection tool: the editor's state right after a snip.
     await click({ x: cw - 60, y: 75 })
-    await key('a')
+    await key('v')
     await sleep(600)
     save(out, 'editor.png', await captureMonitor(target))
 

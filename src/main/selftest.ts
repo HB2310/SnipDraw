@@ -145,9 +145,9 @@ export async function runSelfTest(ctx: Ctx): Promise<void> {
       check(`[${tag}] editor UI is dark`, !!chrome && chrome.lum < 0.3, chrome)
 
       const activeTool = await ew.webContents.executeJavaScript(
-        `document.querySelector('.ToolIcon_type_radio[data-testid="toolbar-arrow"]')?.checked ?? null`
+        `document.querySelector('.ToolIcon_type_radio[data-testid="toolbar-selection"]')?.checked ?? null`
       )
-      check(`[${tag}] arrow tool active`, activeTool === true, activeTool)
+      check(`[${tag}] selection tool active`, activeTool === true, activeTool)
       const fontsOk = await ew.webContents.executeJavaScript(
         `document.fonts.ready.then(() => [...document.fonts].filter(f => f.status === 'loaded').map(f => f.family))`
       )

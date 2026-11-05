@@ -16,7 +16,7 @@ take the whole screen.
 
 ![The same desktop frozen and dimmed by the SnipDraw overlay, with the hint "Drag to snip · Click for the whole screen · Esc or right-click to cancel"](docs/screenshots/windows/2-snip-overlay.webp)
 
-**3. The editor pops up with your snip**, Arrow tool ready. Draw, type, highlight: it's a full Excalidraw canvas.
+**3. The editor pops up with your snip**, ready to annotate. Draw, type, highlight: it's a full Excalidraw canvas.
 
 ![The SnipDraw editor open next to the browser, showing the snipped Google logo and search box ready to annotate](docs/screenshots/windows/3-editor.webp)
 
@@ -27,8 +27,8 @@ take the whole screen.
 - Lives in the system tray (Windows) or menu bar (macOS). No window at launch.
 - **Win+Shift+E** on Windows or **⇧⌘E** on macOS (configurable) freezes every monitor under a dimmed overlay. Drag
   to select a region, or click once to take the whole screen. **Esc** or right-click cancels.
-- The editor opens straight away, centered on the monitor you snipped, with the snip on the canvas and the Arrow
-  tool selected. The snip is shown in its true colors, exactly as it will be copied or saved.
+- The editor opens straight away, centered on the monitor you snipped, with the snip on the canvas and the
+  Selection tool active. The snip is shown in its true colors, exactly as it will be copied or saved.
 - **Copy** (Ctrl+Enter / ⌘↩) puts a PNG on the clipboard and closes the editor. **Save** (Ctrl+S / ⌘S) saves a
   PNG, and Ctrl+Shift+S / ⇧⌘S saves an `.excalidraw` scene. **Esc** closes the editor and asks first if you have
   unsaved annotations.
