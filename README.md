@@ -16,7 +16,6 @@ Here it is on Windows 11:
 **Copy or save.** Press Ctrl+C (⌘C on a Mac) and the annotated image is on your clipboard, exactly as it
 looked in the editor:
 
-![An exported snip: a chart annotated with a red box, an arrow and the label "Best week yet!"](docs/screenshots/result.png)
 
 - Lives in the system tray (Windows) or menu bar (macOS). No window at launch.
 - **Win+Shift+E** on Windows or **⇧⌘E** on macOS (configurable) freezes every monitor under a dimmed overlay. Drag
